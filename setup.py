@@ -7,13 +7,13 @@ setuptools.setup(
     name="signalrcore-F1",
     version="0.1.3",
     author="dawnofwar911",
-    author_email="pride162@gmail.com",
-    description="A Python SignalR Core client(json and messagepack), with invocation auth and two way streaming. Compatible with azure / serverless functions. Also with automatic reconnect and manually reconnect.",
+    author_email="alexander-daniels@hotmail.co.uk",
+    description="A Python SignalR Core client(json and messagepack), that is designed to work with the F1 live timing signalr feed",
     keywords="signalr core client 3.1",
     long_description=long_description,
     long_description_content_type="text/markdown",
     license_file="LICENSE",
-    url="https://github.com/mandrewcito/signalrcore",
+    url="https://github.com/dawnofwar911/signalrcore_f1",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3.6"
