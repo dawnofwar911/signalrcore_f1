@@ -13,14 +13,6 @@ import ssl
 import logging # Already present in the provided file
 import json # Needed for negotiate logic that was merged into start()
 import urllib.parse # Needed for url construction
-try:
-    # This imports the module you created
-    import app_state
-except ImportError:
-    # Handle case where library might be used outside your app context
-    app_state = None
-    # Maybe add logging here if self.logger exists at this point
-    print("WARNING: app_state module not found by websocket_transport.")
 from functools import partial
 from .reconnection import ConnectionStateChecker
 from .connection import ConnectionState
@@ -312,52 +304,6 @@ class WebsocketTransport(BaseTransport):
     # on_message (Patched Version from Response #79 - Calls hub handler AFTER handshake)
     def on_message(self, wsapp, message):
         """Callback for websocket-client receiving messages."""
-        # --- MODIFICATION START: Add Raw String Recording ---
-        # Declare globals needed for recording check within this function's scope
-        # IMPORTANT: This assumes these variables are accessible globally from your main script.
-        # Modifying library files like this has risks and couples the library to your app.
-        #global live_data_file, app_status, app_state_lock, record_live_data
-        session_state = app_state.get_or_create_session_state()
-        should_record_now = False
-        file_handle_now = None
-        save_file_object = None
-        is_saving_active = False
-        if session_state:
-            try:
-                # <<< Use the lock to read shared state safely >>>
-                with session_state.lock:
-                    should_record_now = session_state.record_live_data
-                    file_handle_now = session_state.live_data_file
-                    # You could also check app_state.is_saving_active here if needed
-            except AttributeError as attr_err:
-                self.logger.warning(f"app_state missing required attribute for recording check: {attr_err}")
-                should_record_now = False # Default to false if state is missing attribute
-            except Exception as state_err:
-                 self.logger.error(f"Error reading app_state for recording check: {state_err}")
-                 should_record_now = False # Default to false on other errors
-        if should_record_now and file_handle_now is not None:
-            try:
-                # Ensure message is a string
-                if isinstance(message, bytes):
-                    message_str = message.decode('utf-8')
-                else:
-                    message_str = str(message) # Assume text mode websocket
-
-                # Write raw message string + newline
-                file_handle_now.write(message_str + "\n")
-                # file_handle_now.flush() # Optional
-
-            except IOError as write_io_err:
-                self.logger.error(f"IOError writing raw message in transport: {write_io_err}")
-                # Consider disabling recording flag in app_state here upon persistent error?
-                # try:
-                #    with app_state.app_state_lock: app_state.record_live_data = False
-                # except Exception: pass
-            except Exception as write_err:
-                self.logger.error(f"Unexpected error writing raw message in transport: {write_err}", exc_info=True)
-
-        # --- END ADDED SAVE LOGIC ---
-        
         # --- ADDED Raw Log Line ---
         #self.logger.debug(f"SYNC Raw message received by transport: {message!r}")
         # --- END Added Line ---
