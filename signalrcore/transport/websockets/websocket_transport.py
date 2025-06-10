@@ -317,16 +317,17 @@ class WebsocketTransport(BaseTransport):
         # IMPORTANT: This assumes these variables are accessible globally from your main script.
         # Modifying library files like this has risks and couples the library to your app.
         #global live_data_file, app_status, app_state_lock, record_live_data
+        session_state = app_state.get_or_create_session_state()
         should_record_now = False
         file_handle_now = None
         save_file_object = None
         is_saving_active = False
-        if app_state:
+        if session_state:
             try:
                 # <<< Use the lock to read shared state safely >>>
-                with app_state.app_state_lock:
-                    should_record_now = app_state.record_live_data
-                    file_handle_now = app_state.live_data_file
+                with session_state.lock:
+                    should_record_now = session_state.record_live_data
+                    file_handle_now = session_state.live_data_file
                     # You could also check app_state.is_saving_active here if needed
             except AttributeError as attr_err:
                 self.logger.warning(f"app_state missing required attribute for recording check: {attr_err}")
