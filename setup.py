@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="signalrcore-F1",
-    version="0.1.3",
+    version="0.1.4",
     author="dawnofwar911",
     author_email="alexander-daniels@hotmail.co.uk",
     description="A Python SignalR Core client(json and messagepack), that is designed to work with the F1 live timing signalr feed",
